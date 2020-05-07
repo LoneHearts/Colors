@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using ColorType;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     private PlayerColor m_color;
     public GameObject m_bullet;
+
+    
 
     void Start()
     {
@@ -55,6 +58,14 @@ public class PlayerBehaviour : MonoBehaviour
         if(collider.gameObject.tag == "Enemy")
         {
             StealColor(collider.gameObject);
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if(collider.gameObject.tag == "Enemy")
+        {
+            StealColor(collider.gameObject);
+            collider.gameObject.GetComponent<EnemyBehaviour>().Delete();
         }
     }
 
@@ -110,8 +121,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void StealColor(GameObject enemy)
     {
-        m_color.ChangeColor(enemy.GetComponent<SpriteRenderer>().color);
-        enemy.GetComponent<SpriteRenderer>().color = Color.white;
+        m_color.ChangeColor(enemy.GetComponent<EnemyBehaviour>().m_type);
+        enemy.GetComponent<EnemyBehaviour>().ChangeColor(ColorType.ColorType.Type.White);
         m_canShoot = true;
     }
 

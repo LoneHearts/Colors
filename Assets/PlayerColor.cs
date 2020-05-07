@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using ColorType;
 public class PlayerColor : MonoBehaviour
 {
 
@@ -20,9 +20,9 @@ public class PlayerColor : MonoBehaviour
     }
 
 
-    public void ChangeColor(Color newColor)
+    public void ChangeColor(ColorType.ColorType.Type newColor)
     {
-        m_sprite.color = newColor;
+        m_sprite.color = ColorType.ColorType.m_associatedColor[(int)newColor];
         UpdateWeapon();
     }
 
