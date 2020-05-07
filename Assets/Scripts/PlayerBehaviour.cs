@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -8,18 +9,19 @@ public class PlayerBehaviour : MonoBehaviour
     private Vector2 m_movement;
     private Vector2 m_mousePosition;
     
-    private SpriteRenderer m_Sprite;
+    private SpriteRenderer m_sprite;
+    
+    private bool m_canShoot = true;
 
-    private bool m_automatic = false;
-
-
+    private PlayerColor m_color;
     public GameObject m_bullet;
 
     void Start()
     {
         m_myRigidbody = GetComponent<Rigidbody2D>();
         m_worldCamera = Camera.main;
-        m_Sprite = GetComponent<SpriteRenderer>();
+        m_sprite = GetComponent<SpriteRenderer>();
+        m_color = GetComponent<PlayerColor>();
     }
 
 
@@ -34,21 +36,28 @@ public class PlayerBehaviour : MonoBehaviour
         Move();
         Aim();
 
-        if(Input.GetButtonDown("Fire1") && !m_automatic)
+        if(m_canShoot)
         {
-            Shoot();
+            if(Input.GetButtonDown("Fire1") && !m_color.m_automatic)
+            {
+                Shoot();
+            }
+            else if (Input.GetButton("Fire1") && m_color.m_automatic)
+            {
+                Shoot();
+            }  
         }
-        else if (Input.GetButton("Fire1") && m_automatic)
-        {
-            Shoot();
-        }  
-
-        if(Input.GetButtonDown("Fire2") && !m_automatic)
-        {
-            m_Sprite.color = Color.red;
-        }
-
     }
+
+
+    private void OnCollisionEnter2D(Collision2D collider)
+    {
+        if(collider.gameObject.tag == "Enemy")
+        {
+            StealColor(collider.gameObject);
+        }
+    }
+
 
     private void Move()
     {
@@ -63,14 +72,16 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void Shoot()
     {
-        if(m_Sprite.color == Color.white)
+        m_canShoot = false;
+        if(m_sprite.color == Color.white)
         {
             GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
             Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
             Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
             newBulletRb.AddForce(newBullet.transform.right * 10f, ForceMode2D.Impulse);
+            
         }
-        else if(m_Sprite.color == Color.red)
+        else if(m_sprite.color == Color.red)
         {
             GameObject[] newBullet = new GameObject[5];
             Rigidbody2D newBulletRb;
@@ -84,9 +95,31 @@ public class PlayerBehaviour : MonoBehaviour
                 {
                     Physics2D.IgnoreCollision(newBullet[j].GetComponent<BoxCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
                 }
-                print(newBullet[i].transform.rotation);
                 newBulletRb.AddForce(newBullet[i].transform.right * Random.Range(8f,12f), ForceMode2D.Impulse);
             }
         }
+        else if(m_sprite.color == Color.blue)
+        {
+            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
+            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
+            newBulletRb.AddForce(newBullet.transform.right * 10f, ForceMode2D.Impulse);
+        }
+        StartCoroutine(FireCoolDown());
     }
+
+    private void StealColor(GameObject enemy)
+    {
+        m_color.ChangeColor(enemy.GetComponent<SpriteRenderer>().color);
+        enemy.GetComponent<SpriteRenderer>().color = Color.white;
+        m_canShoot = true;
+    }
+
+    IEnumerator FireCoolDown()
+    {
+        yield return new WaitForSeconds(m_color.m_fireRate);
+        m_canShoot = true;
+    }
+
+    
 }
