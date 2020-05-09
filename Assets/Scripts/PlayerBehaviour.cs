@@ -17,6 +17,8 @@ public class PlayerBehaviour : MonoBehaviour
     private PlayerColor m_color;
     public GameObject m_bullet;
 
+    //private Vector2 m_stopPushing = Vector2.zero;
+
     
 
     void Start()
@@ -29,7 +31,7 @@ public class PlayerBehaviour : MonoBehaviour
 
 
 
-    void Update()
+    void FixedUpdate()
     {
         m_movement.x = Input.GetAxisRaw("Horizontal");
         m_movement.y = Input.GetAxisRaw("Vertical");
@@ -39,6 +41,11 @@ public class PlayerBehaviour : MonoBehaviour
         Move();
         Aim();
 
+        
+    }
+
+    void Update()
+    {
         if(m_canShoot)
         {
             if(Input.GetButtonDown("Fire1") && !m_color.m_automatic)
@@ -73,6 +80,7 @@ public class PlayerBehaviour : MonoBehaviour
     private void Move()
     {
         m_myRigidbody.MovePosition(m_myRigidbody.position + m_movement * m_moveSpeed * Time.fixedDeltaTime);
+        m_myRigidbody.velocity = Vector2.zero;
     }
 
     private void Aim()
@@ -89,7 +97,6 @@ public class PlayerBehaviour : MonoBehaviour
             GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
             Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
             Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
-            newBulletRb.AddForce(newBullet.transform.right * 10f, ForceMode2D.Impulse);
             
         }
         else if(m_sprite.color == Color.red)
@@ -106,7 +113,6 @@ public class PlayerBehaviour : MonoBehaviour
                 {
                     Physics2D.IgnoreCollision(newBullet[j].GetComponent<BoxCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
                 }
-                newBulletRb.AddForce(newBullet[i].transform.right * Random.Range(8f,12f), ForceMode2D.Impulse);
             }
         }
         else if(m_sprite.color == Color.blue)
@@ -114,7 +120,6 @@ public class PlayerBehaviour : MonoBehaviour
             GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
             Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
             Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
-            newBulletRb.AddForce(newBullet.transform.right * 10f, ForceMode2D.Impulse);
         }
         StartCoroutine(FireCoolDown());
     }
@@ -122,7 +127,7 @@ public class PlayerBehaviour : MonoBehaviour
     private void StealColor(GameObject enemy)
     {
         m_color.ChangeColor(enemy.GetComponent<EnemyBehaviour>().m_type);
-        enemy.GetComponent<EnemyBehaviour>().ChangeColor(ColorType.ColorType.Type.White);
+        enemy.GetComponent<EnemyBehaviour>().ChangeColor(ColorType.ColorType.Type.Black);
         m_canShoot = true;
     }
 

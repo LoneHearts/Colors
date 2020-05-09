@@ -1,0 +1,13 @@
+A FAIRE
+
+Enemy shoot
+Enemy pathfinding
+Fichier config
+
+
+A MIEUX FAIRE
+
+lumiere ( No light on bullet itself, Light on shot and destruction)
+Projection cadavre
+Voler la couleur au CAC sur un vivant
+Le sprite du mort ( plus visible lumiere ?)

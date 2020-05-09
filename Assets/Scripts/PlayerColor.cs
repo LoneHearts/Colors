@@ -33,7 +33,7 @@ public class PlayerColor : MonoBehaviour
         if (m_sprite.color == Color.blue)
         {
             m_automatic = true;
-            m_fireRate = 0.1f;
+            m_fireRate = 0.15f;
         }
         else if (m_sprite.color == Color.cyan)
         {
@@ -73,7 +73,7 @@ public class PlayerColor : MonoBehaviour
         else if (m_sprite.color == Color.white)
         {
             m_automatic = false;
-            m_fireRate = 0.0f;
+            m_fireRate = 0.1f;
         }
     }
 }
