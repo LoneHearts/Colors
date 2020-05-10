@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using ColorType;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -13,9 +14,11 @@ public class PlayerBehaviour : MonoBehaviour
     private SpriteRenderer m_sprite;
     
     private bool m_canShoot = true;
-
-    private PlayerColor m_color;
     public GameObject m_bullet;
+
+    private ColorType.ColorType.Type m_type;
+
+    private Light2D m_halo;
 
     //private Vector2 m_stopPushing = Vector2.zero;
 
@@ -23,10 +26,10 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Start()
     {
+        m_halo = transform.GetChild(0).gameObject.GetComponent<Light2D>();
         m_myRigidbody = GetComponent<Rigidbody2D>();
         m_worldCamera = Camera.main;
         m_sprite = GetComponent<SpriteRenderer>();
-        m_color = GetComponent<PlayerColor>();
     }
 
 
@@ -48,11 +51,11 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if(m_canShoot)
         {
-            if(Input.GetButtonDown("Fire1") && !m_color.m_automatic)
+            if(Input.GetButtonDown("Fire1") && !ColorType.ColorType.m_associatedAutomatic[(int)m_type])
             {
                 Shoot();
             }
-            else if (Input.GetButton("Fire1") && m_color.m_automatic)
+            else if (Input.GetButton("Fire1") && ColorType.ColorType.m_associatedAutomatic[(int)m_type])
             {
                 Shoot();
             }  
@@ -126,14 +129,21 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void StealColor(GameObject enemy)
     {
-        m_color.ChangeColor(enemy.GetComponent<EnemyBehaviour>().m_type);
+        ChangeColor(enemy.GetComponent<EnemyBehaviour>().m_type);
         enemy.GetComponent<EnemyBehaviour>().ChangeColor(ColorType.ColorType.Type.Black);
         m_canShoot = true;
     }
 
+    public void ChangeColor(ColorType.ColorType.Type newColor)
+    {
+        m_sprite.color = ColorType.ColorType.m_associatedColor[(int)newColor];
+        m_halo.color = ColorType.ColorType.m_associatedColor[(int)newColor];
+        m_type = newColor;
+    }
+
     IEnumerator FireCoolDown()
     {
-        yield return new WaitForSeconds(m_color.m_fireRate);
+        yield return new WaitForSeconds(ColorType.ColorType.m_associatedFireRate[(int)m_type]);
         m_canShoot = true;
     }
 

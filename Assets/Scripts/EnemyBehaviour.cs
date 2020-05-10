@@ -10,16 +10,85 @@ public class EnemyBehaviour : MonoBehaviour
     private Light2D m_light;
     private CircleCollider2D m_collider;
     private SpriteRenderer m_sprite;
+
+    private RaycastHit2D m_lineOfSight;
     public ColorType.ColorType.Type m_type;
 
+    private GameObject m_player;
+
     private bool m_dead = false;
+
+    private bool m_canShoot = true;
+
+    public GameObject m_bullet;
     void Start()
     {
+        m_player = FindObjectOfType<PlayerBehaviour>().gameObject;
         m_light = GetComponentInChildren<Light2D>();
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_collider = GetComponent<CircleCollider2D>();
         m_sprite = GetComponent<SpriteRenderer>();
         ChangeColor(m_type);
+
+
+
+
+    }
+
+    void FixedUpdate()
+    {
+        m_lineOfSight = Physics2D.Raycast(transform.position, m_player.transform.position-transform.position);
+        if(m_lineOfSight.collider.gameObject.tag == "Player")
+        {
+            Vector3 vectorToTarget = m_player.transform.position - transform.position;
+            float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            if(m_canShoot)
+            {
+                Shoot();
+            }
+        }
+    }
+
+    private void Shoot()
+    {
+        m_canShoot = false;
+        if(m_sprite.color == Color.white)
+        {
+            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
+            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
+            
+        }
+        else if(m_sprite.color == Color.red)
+        {
+            GameObject[] newBullet = new GameObject[5];
+            Rigidbody2D newBulletRb;
+            for(int i=0; i<5; i++)
+            {   
+                newBullet[i] = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
+                newBullet[i].transform.Rotate(0,0,Random.Range(-10f,10f));
+                newBulletRb = newBullet[i].GetComponent<Rigidbody2D>();
+                Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
+                for(int j=0; j<i ;j++)
+                {
+                    Physics2D.IgnoreCollision(newBullet[j].GetComponent<BoxCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
+                }
+            }
+        }
+        else if(m_sprite.color == Color.blue)
+        {
+            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
+            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
+            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
+        }
+        StartCoroutine(FireCoolDown());
+    }
+
+    IEnumerator FireCoolDown()
+    {
+        yield return new WaitForSeconds(ColorType.ColorType.m_associatedFireRate[(int)m_type]);
+        m_canShoot = true;
     }
 
     public void ChangeColor(ColorType.ColorType.Type newColor)
@@ -49,6 +118,7 @@ public class EnemyBehaviour : MonoBehaviour
         //Can slowly decrease power when dead -> less ammunition
         if(!m_dead)
         {
+            this.enabled = false;
             m_dead = true;
             m_collider.isTrigger = true;
             m_light.color = ColorType.ColorType.m_associatedColor[(int)m_type];
