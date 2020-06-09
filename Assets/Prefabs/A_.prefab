@@ -50,7 +50,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   m_gridWorldSize: {x: 30, y: 25}
-  m_nodeRadius: 0.35
+  m_nodeRadius: 0.2
   m_walkableRegion:
   - terrainMask:
       serializedVersion: 2
@@ -59,11 +59,12 @@ MonoBehaviour:
   - terrainMask:
       serializedVersion: 2
       m_Bits: 512
-    terrainPenalty: 10
+    terrainPenalty: 80
   - terrainMask:
       serializedVersion: 2
       m_Bits: 1024
-    terrainPenalty: 3
+    terrainPenalty: 0
+  m_obstacleProximityPenalty: 50
 --- !u!114 &2090599234723036940
 MonoBehaviour:
   m_ObjectHideFlags: 0

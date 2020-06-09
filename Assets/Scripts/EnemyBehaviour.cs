@@ -6,6 +6,8 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class EnemyBehaviour : MonoBehaviour
 {
+    private Unit m_pathfinding;
+    private bool m_hasSeenPlayer = false;
     private Rigidbody2D m_rigidbody;
     private Light2D m_light;
     private CircleCollider2D m_collider;
@@ -23,15 +25,13 @@ public class EnemyBehaviour : MonoBehaviour
     public GameObject m_bullet;
     void Start()
     {
+        m_pathfinding = GetComponent<Unit>();
         m_player = FindObjectOfType<PlayerBehaviour>().gameObject;
         m_light = GetComponentInChildren<Light2D>();
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_collider = GetComponent<CircleCollider2D>();
         m_sprite = GetComponent<SpriteRenderer>();
         ChangeColor(m_type);
-
-
-
 
     }
 
@@ -40,6 +40,7 @@ public class EnemyBehaviour : MonoBehaviour
         m_lineOfSight = Physics2D.Raycast(transform.position, m_player.transform.position-transform.position);
         if(m_lineOfSight.collider.gameObject.tag == "Player")
         {
+            m_pathfinding.enabled = false;
             Vector3 vectorToTarget = m_player.transform.position - transform.position;
             float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
@@ -47,6 +48,11 @@ public class EnemyBehaviour : MonoBehaviour
             {
                 Shoot();
             }
+            m_hasSeenPlayer = true;
+        }
+        else if(m_hasSeenPlayer)
+        {
+            m_pathfinding.enabled = true;
         }
     }
 
@@ -101,7 +107,7 @@ public class EnemyBehaviour : MonoBehaviour
     {
         if(collider.gameObject.tag == "Bullet")
         {
-            Die();
+            Die(collider.relativeVelocity);
         }
     }
 
@@ -113,11 +119,12 @@ public class EnemyBehaviour : MonoBehaviour
         }
     }
 
-    private void Die()
+    private void Die(Vector2 knockback)
     {
         //Can slowly decrease power when dead -> less ammunition
         if(!m_dead)
         {
+            m_pathfinding.enabled = false;
             this.enabled = false;
             m_dead = true;
             m_collider.isTrigger = true;

@@ -14,9 +14,14 @@ public class Unit : MonoBehaviour
 
     Path m_path;
 
-    void Start()
+    void OnDisable()
     {
-        StartCoroutine(UpdatePath());
+        StopCoroutine("FollowPath");
+    }
+
+    void OnEnable()
+    { 
+        PathRequestManager.RequestPath(new PathRequest(transform.position, m_target.position,OnPathFound));
     }
 
     public void OnPathFound(Vector3[] waypoints, bool pathSuccessful)
@@ -29,25 +34,6 @@ public class Unit : MonoBehaviour
         }
     }
 
-    IEnumerator UpdatePath()
-    {
-        if(Time.timeSinceLevelLoad < 0.3f)
-        {
-            yield return new WaitForSeconds(0.3f);
-        }
-        PathRequestManager.RequestPath(new PathRequest(transform.position, m_target.position,OnPathFound));
-        float sqrMoveThreshold = pathUpdateMoveThreshhold * pathUpdateMoveThreshhold;
-        Vector3 targetPosOld = m_target.position;
-        while(true)
-        {
-            yield return new WaitForSeconds(minPathUpdateTime);
-            if((m_target.position - targetPosOld).sqrMagnitude > sqrMoveThreshold)
-            {
-                PathRequestManager.RequestPath(new PathRequest(transform.position, m_target.position,OnPathFound));
-                targetPosOld = m_target.position;
-            }
-        }
-    }
 
     IEnumerator FollowPath()
     {
@@ -78,8 +64,6 @@ public class Unit : MonoBehaviour
                 Vector3 vectorToTarget = m_path.lookPoints[pathIndex] - transform.position;
                 float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                //Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                //transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Lerp(transform.rotation.eulerAngles.z, rotation.eulerAngles.z, Time.deltaTime* 5f));
                 transform.Translate(Vector3.right*Time.deltaTime*m_speed, Space.Self);
             }
 

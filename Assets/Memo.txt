@@ -1,18 +1,21 @@
 A FAIRE
 
 
-Enemy pathfinding
 
 Fichier config
 
-
-
+Munitions
+UI
+Delai sur le shoot
 
 A MIEUX FAIRE
 
 lumiere
 
 Projection cadavre
+Debug a cause du path la Projection
+
+
 Voler la couleur au CAC sur un vivant
 Le sprite du mort ( plus visible lumiere ?)
 
