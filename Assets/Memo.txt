@@ -1,13 +1,22 @@
 A FAIRE
 
-Enemy shoot
+
 Enemy pathfinding
+
 Fichier config
+
+
 
 
 A MIEUX FAIRE
 
-lumiere ( No light on bullet itself, Light on shot and destruction)
+lumiere
+
 Projection cadavre
 Voler la couleur au CAC sur un vivant
 Le sprite du mort ( plus visible lumiere ?)
+
+
+Light on shoot
+Trail on bullet
+Light on hit
