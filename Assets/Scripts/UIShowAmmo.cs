@@ -18,4 +18,10 @@ public class UIShowAmmo : MonoBehaviour
     {
         m_text.text = ammo.ToString();
     }
+
+    public void UpdateAmmo(int ammo, Color newColor)
+    {
+        m_text.text = ammo.ToString();
+        m_text.color = newColor;
+    }
 }

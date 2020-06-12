@@ -5,7 +5,9 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    public bool m_dead = false;
     public float m_moveSpeed = 5f;
+    private float m_fixedDeltaTime = 0.02f;
     private Rigidbody2D m_myRigidbody;
     private Camera m_worldCamera;
     private Vector2 m_movement;
@@ -16,12 +18,15 @@ public class PlayerBehaviour : MonoBehaviour
     private bool m_canShoot = true;
     public GameObject m_bullet;
 
-    private ColorType.ColorType.Type m_type;
+    private ColorType.ColorType.Type m_type = ColorType.ColorType.Type.White;
 
     private Light2D m_halo;
 
     public int m_ammo;
     private UIShowAmmo m_uiAmmo;
+
+    private UIDeath m_uiDeath;
+    
 
     //private Vector2 m_stopPushing = Vector2.zero;
 
@@ -33,7 +38,8 @@ public class PlayerBehaviour : MonoBehaviour
         m_myRigidbody = GetComponent<Rigidbody2D>();
         m_worldCamera = Camera.main;
         m_sprite = GetComponent<SpriteRenderer>();
-        m_uiAmmo.UpdateAmmo(m_ammo);
+        m_ammo = ColorType.ColorType.m_associatedAmmo[(int)m_type];
+        m_uiAmmo.UpdateAmmo(m_ammo, ColorType.ColorType.m_associatedColor[(int)m_type]);
     }
 
 
@@ -62,8 +68,18 @@ public class PlayerBehaviour : MonoBehaviour
             else if (Input.GetButton("Fire1") && ColorType.ColorType.m_associatedAutomatic[(int)m_type])
             {
                 Shoot();
-            }  
+            } 
         }
+        if(Input.GetButton("SlowMo"))
+        {
+            Time.timeScale = 0.3f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+        Time.fixedDeltaTime = m_fixedDeltaTime * Time.timeScale;
+        print(Time.fixedDeltaTime);
     }
 
 
@@ -72,6 +88,10 @@ public class PlayerBehaviour : MonoBehaviour
         if(collider.gameObject.tag == "Enemy")
         {
             StealColor(collider.gameObject);
+        }
+        else if(collider.gameObject.tag == "Bullet")
+        {
+            Die();
         }
     }
     private void OnTriggerEnter2D(Collider2D collider)
@@ -96,6 +116,19 @@ public class PlayerBehaviour : MonoBehaviour
         m_myRigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
     }
 
+    private void Die()
+    {
+        if(!m_dead)
+        {
+            m_dead = true;
+            this.enabled = false;
+            m_sprite.enabled = false;
+            transform.GetChild(0).gameObject.SetActive(false); // C MOCHE
+            transform.GetChild(2).gameObject.SetActive(false);
+            m_uiAmmo.gameObject.SetActive(false);
+            m_uiDeath.Enable();
+        }
+    }
     private void Shoot()
     {
         m_canShoot = false;
@@ -145,13 +178,18 @@ public class PlayerBehaviour : MonoBehaviour
         m_sprite.color = ColorType.ColorType.m_associatedColor[(int)newColor];
         m_halo.color = ColorType.ColorType.m_associatedColor[(int)newColor];
         m_ammo = ColorType.ColorType.m_associatedAmmo[(int)newColor];
-        m_uiAmmo.UpdateAmmo(m_ammo);
+        m_uiAmmo.UpdateAmmo(m_ammo,ColorType.ColorType.m_associatedColor[(int)newColor]);
         m_type = newColor;
     }
 
     public void SetAmmoUi(UIShowAmmo ui)
     {
         m_uiAmmo = ui;
+    }
+
+    public void SetDeathUI(UIDeath ui)
+    {
+        m_uiDeath = ui;
     }
 
     IEnumerator FireCoolDown()

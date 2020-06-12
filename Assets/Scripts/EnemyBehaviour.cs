@@ -16,7 +16,7 @@ public class EnemyBehaviour : MonoBehaviour
     private RaycastHit2D m_lineOfSight;
     public ColorType.ColorType.Type m_type;
 
-    private GameObject m_player;
+    private PlayerBehaviour m_player;
 
     private bool m_dead = false;
 
@@ -26,7 +26,7 @@ public class EnemyBehaviour : MonoBehaviour
     void Start()
     {
         m_pathfinding = GetComponent<Unit>();
-        m_player = FindObjectOfType<PlayerBehaviour>().gameObject;
+        m_player = SceneManager.Instance.player;
         m_light = GetComponentInChildren<Light2D>();
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_collider = GetComponent<CircleCollider2D>();
@@ -37,23 +37,37 @@ public class EnemyBehaviour : MonoBehaviour
 
     void FixedUpdate()
     {
-        m_lineOfSight = Physics2D.Raycast(transform.position, m_player.transform.position-transform.position);
-        if(m_lineOfSight.collider.gameObject.tag == "Player")
+        if(!m_player.m_dead)
         {
-            m_pathfinding.enabled = false;
-            Vector3 vectorToTarget = m_player.transform.position - transform.position;
-            float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-            if(m_canShoot)
+            m_lineOfSight = Physics2D.Raycast(transform.position, m_player.transform.position-transform.position);
+            if(m_lineOfSight.collider.gameObject.tag == "Player")
             {
-                Shoot();
+                m_pathfinding.enabled = false;
+                Vector3 vectorToTarget = m_player.transform.position - transform.position;
+                float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+                if(m_canShoot && m_hasSeenPlayer)
+                {
+                    Shoot();
+                }
+                else if(m_canShoot)
+                {
+                    StartCoroutine(FirstShootLatency());
+                }
+                m_hasSeenPlayer = true;
             }
-            m_hasSeenPlayer = true;
+            else if(m_hasSeenPlayer)
+            {
+                m_pathfinding.enabled = true;
+            }
         }
-        else if(m_hasSeenPlayer)
-        {
-            m_pathfinding.enabled = true;
-        }
+    }
+
+    IEnumerator FirstShootLatency()
+    {
+        m_canShoot = false;
+        yield return new WaitForSeconds(0.5f);
+        Shoot();
     }
 
     private void Shoot()
@@ -124,6 +138,8 @@ public class EnemyBehaviour : MonoBehaviour
         //Can slowly decrease power when dead -> less ammunition
         if(!m_dead)
         {
+            StopCoroutine(FirstShootLatency());
+            SceneManager.Instance.EnemyKilled();
             m_pathfinding.enabled = false;
             this.enabled = false;
             m_dead = true;
