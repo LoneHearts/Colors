@@ -4,9 +4,16 @@ A FAIRE
 
 Fichier config
 
-Munitions
-UI
+
 Delai sur le shoot
+
+Scene début
+
+Mort
+
+
+
+
 
 A MIEUX FAIRE
 
@@ -23,3 +30,5 @@ Le sprite du mort ( plus visible lumiere ?)
 Light on shoot
 Trail on bullet
 Light on hit
+
+UI

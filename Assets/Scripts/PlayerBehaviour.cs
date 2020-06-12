@@ -20,6 +20,9 @@ public class PlayerBehaviour : MonoBehaviour
 
     private Light2D m_halo;
 
+    public int m_ammo;
+    private UIShowAmmo m_uiAmmo;
+
     //private Vector2 m_stopPushing = Vector2.zero;
 
     
@@ -30,6 +33,7 @@ public class PlayerBehaviour : MonoBehaviour
         m_myRigidbody = GetComponent<Rigidbody2D>();
         m_worldCamera = Camera.main;
         m_sprite = GetComponent<SpriteRenderer>();
+        m_uiAmmo.UpdateAmmo(m_ammo);
     }
 
 
@@ -49,7 +53,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Update()
     {
-        if(m_canShoot)
+        if(m_canShoot && m_ammo > 0)
         {
             if(Input.GetButtonDown("Fire1") && !ColorType.ColorType.m_associatedAutomatic[(int)m_type])
             {
@@ -95,6 +99,7 @@ public class PlayerBehaviour : MonoBehaviour
     private void Shoot()
     {
         m_canShoot = false;
+        m_ammo--;
         if(m_sprite.color == Color.white)
         {
             GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
@@ -124,6 +129,7 @@ public class PlayerBehaviour : MonoBehaviour
             Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
             Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
         }
+        m_uiAmmo.UpdateAmmo(m_ammo);
         StartCoroutine(FireCoolDown());
     }
 
@@ -138,7 +144,14 @@ public class PlayerBehaviour : MonoBehaviour
     {
         m_sprite.color = ColorType.ColorType.m_associatedColor[(int)newColor];
         m_halo.color = ColorType.ColorType.m_associatedColor[(int)newColor];
+        m_ammo = ColorType.ColorType.m_associatedAmmo[(int)newColor];
+        m_uiAmmo.UpdateAmmo(m_ammo);
         m_type = newColor;
+    }
+
+    public void SetAmmoUi(UIShowAmmo ui)
+    {
+        m_uiAmmo = ui;
     }
 
     IEnumerator FireCoolDown()
