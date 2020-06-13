@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class SceneManager : MonoBehaviour {
+
+    public bool m_levelfinished;
     public PlayerBehaviour player;
     private int numberOfEnemies;
 
@@ -46,8 +48,12 @@ public class SceneManager : MonoBehaviour {
 
     public void EndLevel()
     {
-        player.enabled = false;
-        FindObjectOfType<UIWin>().Enable();
+        if(!m_levelfinished)
+        {
+            m_levelfinished = true;
+            player.enabled = false;
+            FindObjectOfType<UIWin>().Enable();
+        }
     }
     private void CountEnemies()
     {

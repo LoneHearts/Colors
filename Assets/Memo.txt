@@ -8,7 +8,7 @@ Fichier config
 
 Scene début
 
-Mort
+
 
 
 
@@ -21,7 +21,7 @@ lumiere
 Projection cadavre
 Debug a cause du path la Projection
 
-
+Mort
 Voler la couleur au CAC sur un vivant
 Le sprite du mort ( plus visible lumiere ?)
 
