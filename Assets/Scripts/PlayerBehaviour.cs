@@ -5,6 +5,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    public bool m_GODMODE = false;
     private ShootManager m_shoot;
     public bool m_dead = false;
     public float m_moveSpeed = 5f;
@@ -124,7 +125,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void Die()
     {
-        if(!m_dead && !SceneManager.Instance.m_levelfinished)
+        if(!m_dead && !SceneManager.Instance.m_levelfinished && !m_GODMODE)
         {
             m_dead = true;
             this.enabled = false;
