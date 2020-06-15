@@ -19,12 +19,10 @@ public class EnemyBehaviour : MonoBehaviour
     private PlayerBehaviour m_player;
 
     private bool m_dead = false;
-
-    private bool m_canShoot = true;
-
-    public GameObject m_bullet;
+    private ShootManager m_shoot;
     void Start()
     {
+        m_shoot = GetComponent<ShootManager>();
         m_pathfinding = GetComponent<Unit>();
         m_player = SceneManager.Instance.player;
         m_light = GetComponentInChildren<Light2D>();
@@ -46,15 +44,14 @@ public class EnemyBehaviour : MonoBehaviour
                 Vector3 vectorToTarget = m_player.transform.position - transform.position;
                 float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                if(m_canShoot && m_hasSeenPlayer)
+                if(m_hasSeenPlayer)
                 {
-                    Shoot();
+                    m_shoot.Shoot(m_type);
                 }
-                else if(m_canShoot)
+                else
                 {
                     StartCoroutine(FirstShootLatency());
                 }
-                m_hasSeenPlayer = true;
             }
             else if(m_hasSeenPlayer)
             {
@@ -65,51 +62,11 @@ public class EnemyBehaviour : MonoBehaviour
 
     IEnumerator FirstShootLatency()
     {
-        m_canShoot = false;
         yield return new WaitForSeconds(0.5f);
-        Shoot();
+        m_shoot.Shoot(m_type);
+        m_hasSeenPlayer = true;
     }
 
-    private void Shoot()
-    {
-        m_canShoot = false;
-        if(m_sprite.color == Color.white)
-        {
-            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
-            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
-            
-        }
-        else if(m_sprite.color == Color.red)
-        {
-            GameObject[] newBullet = new GameObject[5];
-            Rigidbody2D newBulletRb;
-            for(int i=0; i<5; i++)
-            {   
-                newBullet[i] = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
-                newBullet[i].transform.Rotate(0,0,Random.Range(-10f,10f));
-                newBulletRb = newBullet[i].GetComponent<Rigidbody2D>();
-                Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
-                for(int j=0; j<i ;j++)
-                {
-                    Physics2D.IgnoreCollision(newBullet[j].GetComponent<BoxCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
-                }
-            }
-        }
-        else if(m_sprite.color == Color.blue)
-        {
-            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
-            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
-        }
-        StartCoroutine(FireCoolDown());
-    }
-
-    IEnumerator FireCoolDown()
-    {
-        yield return new WaitForSeconds(ColorType.ColorType.m_associatedFireRate[(int)m_type]);
-        m_canShoot = true;
-    }
 
     public void ChangeColor(ColorType.ColorType.Type newColor)
     {

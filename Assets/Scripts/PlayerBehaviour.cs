@@ -5,6 +5,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    private ShootManager m_shoot;
     public bool m_dead = false;
     public float m_moveSpeed = 5f;
     private float m_fixedDeltaTime = 0.02f;
@@ -14,9 +15,6 @@ public class PlayerBehaviour : MonoBehaviour
     private Vector2 m_mousePosition;
     
     private SpriteRenderer m_sprite;
-    
-    private bool m_canShoot = true;
-    public GameObject m_bullet;
 
     private ColorType.ColorType.Type m_type = ColorType.ColorType.Type.White;
 
@@ -40,6 +38,7 @@ public class PlayerBehaviour : MonoBehaviour
         m_sprite = GetComponent<SpriteRenderer>();
         m_ammo = ColorType.ColorType.m_associatedAmmo[(int)m_type];
         m_uiAmmo.UpdateAmmo(m_ammo, ColorType.ColorType.m_associatedColor[(int)m_type]);
+        m_shoot = GetComponent<ShootManager>();
     }
 
 
@@ -59,15 +58,23 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Update()
     {
-        if(m_canShoot && m_ammo > 0)
+        if(m_ammo > 0)
         {
             if(Input.GetButtonDown("Fire1") && !ColorType.ColorType.m_associatedAutomatic[(int)m_type])
             {
-                Shoot();
+                if(m_shoot.Shoot(m_type))
+                {
+                    m_ammo--;
+                    m_uiAmmo.UpdateAmmo(m_ammo);
+                }
             }
             else if (Input.GetButton("Fire1") && ColorType.ColorType.m_associatedAutomatic[(int)m_type])
             {
-                Shoot();
+                if(m_shoot.Shoot(m_type))
+                {
+                    m_ammo--;
+                    m_uiAmmo.UpdateAmmo(m_ammo);
+                }
             } 
         }
         if(Input.GetButton("SlowMo"))
@@ -79,7 +86,6 @@ public class PlayerBehaviour : MonoBehaviour
             Time.timeScale = 1f;
         }
         Time.fixedDeltaTime = m_fixedDeltaTime * Time.timeScale;
-        print(Time.fixedDeltaTime);
     }
 
 
@@ -130,48 +136,11 @@ public class PlayerBehaviour : MonoBehaviour
             m_uiDeath.Enable();
         }
     }
-    private void Shoot()
-    {
-        m_canShoot = false;
-        m_ammo--;
-        if(m_sprite.color == Color.white)
-        {
-            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
-            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
-            
-        }
-        else if(m_sprite.color == Color.red)
-        {
-            GameObject[] newBullet = new GameObject[5];
-            Rigidbody2D newBulletRb;
-            for(int i=0; i<5; i++)
-            {   
-                newBullet[i] = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
-                newBullet[i].transform.Rotate(0,0,Random.Range(-10f,10f));
-                newBulletRb = newBullet[i].GetComponent<Rigidbody2D>();
-                Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
-                for(int j=0; j<i ;j++)
-                {
-                    Physics2D.IgnoreCollision(newBullet[j].GetComponent<BoxCollider2D>(),newBullet[i].GetComponent<BoxCollider2D>());
-                }
-            }
-        }
-        else if(m_sprite.color == Color.blue)
-        {
-            GameObject newBullet = Instantiate(m_bullet, this.transform.position, this.transform.rotation);
-            Rigidbody2D newBulletRb = newBullet.GetComponent<Rigidbody2D>();
-            Physics2D.IgnoreCollision(GetComponent<CircleCollider2D>(),newBullet.GetComponent<BoxCollider2D>());
-        }
-        m_uiAmmo.UpdateAmmo(m_ammo);
-        StartCoroutine(FireCoolDown());
-    }
-
     private void StealColor(GameObject enemy)
     {
         ChangeColor(enemy.GetComponent<EnemyBehaviour>().m_type);
         enemy.GetComponent<EnemyBehaviour>().ChangeColor(ColorType.ColorType.Type.Black);
-        m_canShoot = true;
+        m_shoot.m_canShoot = true;
     }
 
     public void ChangeColor(ColorType.ColorType.Type newColor)
@@ -191,12 +160,6 @@ public class PlayerBehaviour : MonoBehaviour
     public void SetDeathUI(UIDeath ui)
     {
         m_uiDeath = ui;
-    }
-
-    IEnumerator FireCoolDown()
-    {
-        yield return new WaitForSeconds(ColorType.ColorType.m_associatedFireRate[(int)m_type]);
-        m_canShoot = true;
     }
 
     

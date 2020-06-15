@@ -4,14 +4,13 @@ A FAIRE
 
 Fichier config
 
-
+Bouton pause
 
 Scene début
 
+Menu
 
-
-
-
+Son
 
 
 A MIEUX FAIRE
@@ -31,3 +30,29 @@ Trail on bullet
 Light on hit
 
 UI
+
+
+
+COLOR - ARME 
+
+
+Red - GROSSE BATTEUSE
+Orange - AK
+Tangerine - MP5
+Yellow - Uzi
+
+Green - Sniper
+Lime - Scout
+
+Navy - Judge
+Blue - MAG5
+Cyan - Canon scié
+
+Purple - LANCE ROQUETTES
+Magenta - LASER
+Rose - LANCE FLAMMES
+
+Black - Rien
+Grey - Zombie
+
+White - Me
