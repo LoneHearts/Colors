@@ -125,12 +125,12 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void Die()
     {
-        if(!m_dead && !SceneManager.Instance.m_levelfinished && !m_GODMODE)
+        if(!m_dead && !LevelManager.Instance.m_levelfinished && !m_GODMODE)
         {
             m_dead = true;
             this.enabled = false;
             m_sprite.enabled = false;
-            SceneManager.Instance.m_levelfinished = true;
+            LevelManager.Instance.m_levelfinished = true;
             transform.GetChild(0).gameObject.SetActive(false); // C MOCHE
             transform.GetChild(2).gameObject.SetActive(false);
             m_uiAmmo.gameObject.SetActive(false);

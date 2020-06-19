@@ -6,14 +6,16 @@ Fichier config
 
 Bouton pause
 
-Scene début
 
-Menu
 
 Son
 
+Options -> Volume Slider
+
 
 A MIEUX FAIRE
+
+StartMenu
 
 lumiere
 
@@ -46,7 +48,7 @@ Lime - Scout
 
 Navy - Judge
 Blue - MAG5
-Cyan - Canon scié
+Cyan - Double Coup
 
 Purple - LANCE ROQUETTES
 Magenta - LASER

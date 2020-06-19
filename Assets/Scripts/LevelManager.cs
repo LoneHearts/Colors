@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class SceneManager : MonoBehaviour {
+public class LevelManager : MonoBehaviour {
 
     public bool m_levelfinished;
     public PlayerBehaviour player;
     private int numberOfEnemies;
 
-    public static SceneManager Instance { get; private set; } // static singleton
+    public static LevelManager Instance { get; private set; } // static singleton
     void Awake() 
     {
         if (Instance == null) 

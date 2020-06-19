@@ -8,7 +8,7 @@ public class UIDeath : MonoBehaviour
     private PlayerBehaviour m_player;
     void Start()
     {
-        SceneManager.Instance.player.SetDeathUI(this);
+        LevelManager.Instance.player.SetDeathUI(this);
     }
     
     public void Enable()

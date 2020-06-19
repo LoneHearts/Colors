@@ -11,7 +11,7 @@ public class UIShowAmmo : MonoBehaviour
     void Awake()
     {
         m_text = GetComponent<Text>();
-        SceneManager.Instance.player.SetAmmoUi(this);
+        LevelManager.Instance.player.SetAmmoUi(this);
     }
 
     public void UpdateAmmo(int ammo)

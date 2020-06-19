@@ -24,7 +24,7 @@ public class EnemyBehaviour : MonoBehaviour
     {
         m_shoot = GetComponent<ShootManager>();
         m_pathfinding = GetComponent<Unit>();
-        m_player = SceneManager.Instance.player;
+        m_player = LevelManager.Instance.player;
         m_light = GetComponentInChildren<Light2D>();
         m_rigidbody = GetComponent<Rigidbody2D>();
         m_collider = GetComponent<CircleCollider2D>();
@@ -96,7 +96,7 @@ public class EnemyBehaviour : MonoBehaviour
         if(!m_dead)
         {
             StopCoroutine(FirstShootLatency());
-            SceneManager.Instance.EnemyKilled();
+            LevelManager.Instance.EnemyKilled();
             m_pathfinding.enabled = false;
             this.enabled = false;
             m_dead = true;
