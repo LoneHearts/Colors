@@ -8,6 +8,7 @@ public class PlayerBehaviour : MonoBehaviour
     public bool m_GODMODE = false;
     private ShootManager m_shoot;
     public bool m_dead = false;
+    private float m_slowMo = 1f;
     public float m_moveSpeed = 5f;
     private float m_fixedDeltaTime = 0.02f;
     private Rigidbody2D m_myRigidbody;
@@ -23,6 +24,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     public int m_ammo;
     private UIShowAmmo m_uiAmmo;
+    private UISlowMo m_uiSlowMo;
 
     private UIDeath m_uiDeath;
     
@@ -39,6 +41,8 @@ public class PlayerBehaviour : MonoBehaviour
         m_sprite = GetComponent<SpriteRenderer>();
         m_ammo = ColorType.ColorType.m_associatedAmmo[(int)m_type];
         m_uiAmmo.UpdateAmmo(m_ammo, ColorType.ColorType.m_associatedColor[(int)m_type]);
+        m_slowMo = 1f;
+        m_uiSlowMo.UpdateColor(ColorType.ColorType.m_associatedColor[(int)m_type]);
         m_shoot = GetComponent<ShootManager>();
     }
 
@@ -53,11 +57,11 @@ public class PlayerBehaviour : MonoBehaviour
 
         Move();
         Aim();
-
-        
+        TryShoot();
+        SlowMo();        
     }
 
-    void Update()
+    private void TryShoot()
     {
         if(m_ammo > 0)
         {
@@ -78,17 +82,27 @@ public class PlayerBehaviour : MonoBehaviour
                 }
             } 
         }
-        if(Input.GetButton("SlowMo"))
+    }
+
+    private void SlowMo()
+    {
+        if(Input.GetButton("SlowMo") && m_slowMo > 0f)
         {
             Time.timeScale = 0.3f;
+            m_slowMo = m_slowMo - Time.unscaledDeltaTime * 0.5f;
+            m_uiSlowMo.UpdateValue(m_slowMo);
         }
         else
         {
             Time.timeScale = 1f;
+            if(m_slowMo < 1f)
+            {
+                m_slowMo = m_slowMo + Time.unscaledDeltaTime * 0.1f;
+                m_uiSlowMo.UpdateValue(m_slowMo);
+            }
         }
         Time.fixedDeltaTime = m_fixedDeltaTime * Time.timeScale;
     }
-
 
     private void OnCollisionEnter2D(Collision2D collider)
     {
@@ -125,12 +139,12 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void Die()
     {
-        if(!m_dead && !LevelManager.Instance.m_levelfinished && !m_GODMODE)
+        if(!m_dead && !LevelManager.Instance.m_levelFinished && !m_GODMODE)
         {
             m_dead = true;
             this.enabled = false;
             m_sprite.enabled = false;
-            LevelManager.Instance.m_levelfinished = true;
+            LevelManager.Instance.m_levelFinished = true;
             transform.GetChild(0).gameObject.SetActive(false); // C MOCHE
             transform.GetChild(2).gameObject.SetActive(false);
             m_uiAmmo.gameObject.SetActive(false);
@@ -150,12 +164,19 @@ public class PlayerBehaviour : MonoBehaviour
         m_halo.color = ColorType.ColorType.m_associatedColor[(int)newColor];
         m_ammo = ColorType.ColorType.m_associatedAmmo[(int)newColor];
         m_uiAmmo.UpdateAmmo(m_ammo,ColorType.ColorType.m_associatedColor[(int)newColor]);
+        m_slowMo = 1f;
+        m_uiSlowMo.UpdateColor(ColorType.ColorType.m_associatedColor[(int)newColor]);
         m_type = newColor;
     }
 
     public void SetAmmoUi(UIShowAmmo ui)
     {
         m_uiAmmo = ui;
+    }
+
+    public void SetSlowMoUi(UISlowMo ui)
+    {
+        m_uiSlowMo = ui;
     }
 
     public void SetDeathUI(UIDeath ui)

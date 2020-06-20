@@ -4,7 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour {
 
-    public bool m_levelfinished;
+    private float m_timeScale;
+    private bool m_gamePaused = false;
+    
+    [HideInInspector]
+    public bool m_levelFinished;
+    [HideInInspector]
     public PlayerBehaviour player;
     private int numberOfEnemies;
 
@@ -28,7 +33,7 @@ public class LevelManager : MonoBehaviour {
     {
         CountEnemies();
     }
-    void Update()
+    void FixedUpdate()
     {
         if(Input.GetButtonDown("Restart"))
         {
@@ -40,17 +45,45 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
+    void Update()
+    {
+        if(Input.GetButtonDown("Pause"))
+        {
+            PauseLevel();
+        }
+    }
+
     public void RestartLevel()
     {
         Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene(); 
         UnityEngine.SceneManagement.SceneManager.LoadScene("DevRoom");
     }
 
+    private void PauseLevel()
+    {
+        if(!m_levelFinished)
+        {
+            if(m_gamePaused)
+            {
+                m_gamePaused = false;
+                Time.timeScale = m_timeScale;
+                FindObjectOfType<UIPause>().Disable();
+            }
+            else
+            {
+                m_gamePaused = true;
+                m_timeScale = Time.timeScale;
+                Time.timeScale = 0f;
+                FindObjectOfType<UIPause>().Enable();
+            }
+        }
+    }
+
     public void EndLevel()
     {
-        if(!m_levelfinished)
+        if(!m_levelFinished)
         {
-            m_levelfinished = true;
+            m_levelFinished = true;
             player.enabled = false;
             FindObjectOfType<UIWin>().Enable();
         }

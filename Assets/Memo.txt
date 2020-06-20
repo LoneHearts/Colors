@@ -4,19 +4,15 @@ A FAIRE
 
 Fichier config
 
-Bouton pause
-
-
-
 Son
 
-Options -> Volume Slider
+Options -> Script Volume Slider
 
 
 A MIEUX FAIRE
 
 StartMenu
-
+PauseMenu
 lumiere
 
 Projection cadavre
@@ -32,7 +28,7 @@ Trail on bullet
 Light on hit
 
 UI
-
+UI slow mo
 
 
 COLOR - ARME 
