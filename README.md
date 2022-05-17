@@ -4,7 +4,7 @@ This game was created for the Game Design and Implementation Course at Beijing J
 
 You can find a demo in the DEMO folder<br><br>
 
-The content is still being updated
+
 To check the source code of the demo version
 Go to the commit with the tag "BJTU-Release"
 
